@@ -1,2 +1,3 @@
+include ':permetta-lib'
 include ':app'
 rootProject.name = "permetta"

@@ -1,8 +1,8 @@
-package com.bravedroid.permetta.permission
+package com.bravedroid.api
 
 import android.util.Log
 
-object LogHelper {
+object LogCoreHelper {
     private const val TAG = "LIFE_CYCLE"
 
     fun Any.logLifeCycle(methodName: String, componentName: String? = null) {

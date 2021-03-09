@@ -1,43 +1,28 @@
-package com.bravedroid.permetta.permission
+package com.bravedroid.permetta.permission.oldapi
 
-import android.Manifest
 import android.content.Context
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
-import com.bravedroid.permetta.base.BaseFragment
+import com.bravedroid.api.DangerousPermission
+import com.bravedroid.api.PermissionStatus
+import com.bravedroid.api.fragmentpermission.OldCorePermissionFragment
 import com.bravedroid.permetta.databinding.FragmentPermissionBinding
 import com.bravedroid.permetta.permission.LogHelper.logInformation
 
 
-/**
- * A simple [Fragment] subclass.
- * Use the [PermissionFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class PermissionFragment : BaseFragment() {
+class PermissionFragment : OldCorePermissionFragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
     private var binding: FragmentPermissionBinding? = null
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment PermissionFragment.
-         */
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
             PermissionFragment().apply {
@@ -126,36 +111,27 @@ class PermissionFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding?.buttonPermission?.setOnClickListener {
-            requestPermissions(
-                arrayOf(
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.CAMERA
+            requestPermission(
+                listOf(
+                    DangerousPermission.ACCESS_FINE_LOCATION,
+                    DangerousPermission.CAMERA,
                 ),
-                1
+                ::onPermissionsResponse,
             )
         }
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 1) {
-            grantResults.forEachIndexed { index, element ->
-                if (element == PackageManager.PERMISSION_GRANTED) {
-                    Log.d(
-                        "PermissionOld",
-                        " PERMISSION_GRANTED ${permissions[index]} from fragment ${hashCode()}"
-                    )
-                } else {
-                    Log.d(
-                        "PermissionOld",
-                        " PERMISSION_DENIED ${permissions[index]} from fragment ${hashCode()}"
-                    )
-                }
-            }
+    private fun onPermissionsResponse(statusPermissionsMap: Map<DangerousPermission, PermissionStatus>) {
+        statusPermissionsMap.filter {
+            it.value == PermissionStatus.GRANTED
+        }.forEach {
+            Log.d("PERMISSION_GRANTED", "${it.key} ")
+        }
+
+        statusPermissionsMap.filter {
+            it.value == PermissionStatus.DENIED
+        }.forEach {
+            Log.d("PERMISSION_DENIED", "${it.key} ")
         }
     }
 }

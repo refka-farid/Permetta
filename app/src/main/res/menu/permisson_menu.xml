@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/one_permission_old"
+        android:title="Request One Permission old" />
+    <item
+        android:id="@+id/one_permission_new"
+        android:title="Request One Permission new" />
+    <item
+        android:id="@+id/multiple_permission_old"
+        android:title="Request multiple permissions old" />
+
+    <item
+        android:id="@+id/multiple_permission_new"
+        android:title="Request multiple permissions new" />
+</menu>

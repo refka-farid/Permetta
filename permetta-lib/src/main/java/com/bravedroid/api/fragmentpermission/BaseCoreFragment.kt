@@ -1,4 +1,5 @@
-package com.bravedroid.permetta.base
+package com.bravedroid.api
+
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,25 +9,23 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
-import com.bravedroid.permetta.R
-import com.bravedroid.permetta.permission.LogHelper
-import com.bravedroid.permetta.permission.LogHelper.logLifeCycle
-import com.bravedroid.permetta.permission.oldapi.PermissionActivity
+import com.bravedroid.api.LogCoreHelper.logLifeCycle
+import com.bravedroid.api.activitypermission.OldCorePermissionActivity
 
-open class BaseFragment : Fragment(), LifecycleObserver {
+open class BaseCoreFragment : Fragment(), LifecycleObserver {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         logLifeCycle("onAttach")
         val hashcode = requireActivity().hashCode().toString()
-        LogHelper.logInformation("#onAttach the hashcode of my activity is $hashcode")
+        LogCoreHelper.logInformation("#onAttach the hashcode of my activity is $hashcode")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         logLifeCycle("onCreate")
         val hashcode = requireActivity().hashCode().toString()
-        LogHelper.logInformation("#onCreate the hashcode of my activity is $hashcode")
+        LogCoreHelper.logInformation("#onCreate the hashcode of my activity is $hashcode")
     }
 
     override fun onCreateView(
@@ -35,29 +34,29 @@ open class BaseFragment : Fragment(), LifecycleObserver {
     ): View? {
         logLifeCycle("onCreateView")
         val hashcode = requireActivity().hashCode().toString()
-        LogHelper.logInformation("#onCreateView the hashcode of my activity is $hashcode")
+        LogCoreHelper.logInformation("#onCreateView the hashcode of my activity is $hashcode")
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_base, container, false)
+        return inflater.inflate(R.layout.fragment_base_core, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         logLifeCycle("onViewCreated")
         val hashcode = requireActivity().hashCode().toString()
-        LogHelper.logInformation("#onViewCreated the hashcode of my activity is $hashcode")
+        LogCoreHelper.logInformation("#onViewCreated the hashcode of my activity is $hashcode")
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     protected fun activityHasBeenCreated() {
-        LogHelper.logInformation("activityHasBeenCreated from fragment")
-        (context as PermissionActivity).lifecycle.removeObserver(this)
+        LogCoreHelper.logInformation("activityHasBeenCreated from fragment")
+        (context as OldCorePermissionActivity).lifecycle.removeObserver(this)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         logLifeCycle("onActivityCreated")
         val hashcode = requireActivity().hashCode().toString()
-        LogHelper.logInformation("#onActivityCreated the hashcode of my activity is $hashcode")
+        LogCoreHelper.logInformation("#onActivityCreated the hashcode of my activity is $hashcode")
     }
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
@@ -107,6 +106,6 @@ open class BaseFragment : Fragment(), LifecycleObserver {
 
     companion object {
         @JvmStatic
-        fun newInstance(param1: String, param2: String) = BaseFragment()
+        fun newInstance(param1: String, param2: String) = BaseCoreFragment()
     }
 }
