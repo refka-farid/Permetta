@@ -9,8 +9,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.bravedroid.permetta.R
-import com.bravedroid.permetta.permission.LogHelper
-import com.bravedroid.permetta.permission.LogHelper.logLifeCycle
+import com.bravedroid.permetta.base.LogHelper.logLifeCycle
 import com.bravedroid.permetta.permission.oldapi.PermissionActivity
 
 open class BaseFragment : Fragment(), LifecycleObserver {
@@ -30,8 +29,9 @@ open class BaseFragment : Fragment(), LifecycleObserver {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View? {
         logLifeCycle("onCreateView")
         val hashcode = requireActivity().hashCode().toString()

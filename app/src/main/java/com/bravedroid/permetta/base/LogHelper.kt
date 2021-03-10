@@ -1,4 +1,4 @@
-package com.bravedroid.permetta.permission
+package com.bravedroid.permetta.base
 
 import android.util.Log
 

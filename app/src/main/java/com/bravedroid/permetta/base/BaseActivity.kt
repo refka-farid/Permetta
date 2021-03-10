@@ -2,7 +2,7 @@ package com.bravedroid.permetta.base
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.bravedroid.permetta.permission.LogHelper.logLifeCycle
+import com.bravedroid.permetta.base.LogHelper.logLifeCycle
 
 open class BaseActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
