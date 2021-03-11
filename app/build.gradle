@@ -38,27 +38,39 @@ android {
 
 dependencies {
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation 'androidx.core:core-ktx:1.3.2'
-    implementation 'androidx.appcompat:appcompat:1.3.0-beta01'
-    implementation "androidx.activity:activity-ktx:1.3.0-alpha03"
+    //jvm
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$versions.kotlin"
+    //android core
+    implementation "androidx.core:core-ktx:$versions.core_ktx"
+    implementation "androidx.appcompat:appcompat:$versions.appcompat"
+    implementation "androidx.activity:activity-ktx:$versions.activity_ktx"
+    //navigation
+    implementation "androidx.navigation:navigation-fragment-ktx:$versions.navigation_fragment_ktx"
+    implementation "androidx.navigation:navigation-ui-ktx:$versions.navigation_ui_ktx"
 
-    implementation 'com.google.android.material:material:1.3.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.3.3'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.3.3'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.3.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.0'
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.3.3'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.3.3'
-    implementation 'com.karumi:dexter:6.2.2'
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    // coroutine
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$versions.coroutines"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$versions.coroutines"
+    //ui
+    implementation "com.google.android.material:material:$versions.material"
+    implementation "androidx.constraintlayout:constraintlayout:$versions.constraintlayout"
+    // Lifecycle
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$versions.lifecycle_ktx"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$versions.lifecycle_ktx"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$versions.lifecycle_ktx"
 
+    //implementation "androidx.lifecycle:lifecycle-common-java8:2.2.0"
+
+    //lib
     implementation project(path: ':permetta-lib')
-    implementation 'androidx.navigation:navigation-fragment:2.3.3'
-    implementation 'androidx.navigation:navigation-ui:2.3.3'
 
-    testImplementation 'junit:junit:4.+'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    //dexter
+    implementation "com.karumi:dexter:$versions.dexter"
+
+    //test
+    testImplementation "junit:junit:$versions.junit"
+    testImplementation "androidx.arch.core:core-testing:$versions.arch"
+    //android test
+    androidTestImplementation "androidx.test.ext:junit:$versions.ext_junit"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$versions.espresso_core"
 }

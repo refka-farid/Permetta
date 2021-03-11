@@ -1,4 +1,5 @@
 package com.bravedroid.permetta.base
+
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,6 +15,52 @@ import com.bravedroid.permetta.permission.oldapi.PermissionActivity
 
 open class BaseFragment : Fragment(), LifecycleObserver {
 
+    /**
+
+    private class PermissionActivityObserver(private var context: Context?) : LifecycleObserver {
+    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
+    fun activityHasBeenCreated() {
+    LogHelper.logInformation("activityHasBeenCreated from observer")
+    (context as? PermissionActivity)?.lifecycle?.removeObserver(this) ?: return
+    context = null
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    fun activityHasBeenStarted() {
+    LogHelper.logInformation("activityHasBeenStarted")
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    fun activityHasBeenResumed() {
+    LogHelper.logInformation("activityHasBeenResumed")
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+    fun activityHasBeenPaused() {
+    LogHelper.logInformation("activityHasBeenPaused")
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    fun activityHasBeenStopped() {
+    LogHelper.logInformation("activityHasBeenStopped")
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+    fun activityHasBeenDestroyed() {
+    LogHelper.logInformation("activityHasBeenDestroyed")
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_ANY)
+    fun activityHasBeenANY() {
+    LogHelper.logInformation("activityHasBeenAny")
+    }
+    }
+
+    override fun onAttach(context: Context) {
+    super.onAttach(context)
+    (context as AppCompatActivity).lifecycle.addObserver(PermissionActivityObserver(context))
+    }
+     **/
     override fun onAttach(context: Context) {
         super.onAttach(context)
         logLifeCycle("onAttach")

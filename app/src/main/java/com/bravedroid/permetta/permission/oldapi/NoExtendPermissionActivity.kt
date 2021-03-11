@@ -14,6 +14,7 @@ import com.bravedroid.permetta.databinding.ActivityNoExtendPermissionBinding
 class NoExtendPermissionActivity : AppCompatActivity() {
 
     private val permissionHelper: PermissionHelper = PermissionHelper()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding = ActivityNoExtendPermissionBinding.inflate(layoutInflater)
@@ -83,4 +84,5 @@ class NoExtendPermissionActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         permissionHelper.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
+
 }

@@ -18,17 +18,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Permetta">
         <activity android:name=".permission.oldapi.NoExtendPermissionActivity"
-            android:exported="true"/>
-        <activity android:name=".permission.drawer.MasterDetailsActivity">
+            android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+            <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+    </activity>
+        <activity android:name=".permission.drawer.MasterDetailsActivity"/>
         <activity
             android:name=".permission.oldapi.PermissionActivity"
             android:exported="true" />
+
     </application>
 
 </manifest>

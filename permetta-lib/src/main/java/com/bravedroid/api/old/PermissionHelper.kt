@@ -1,6 +1,7 @@
 package com.bravedroid.api.old
 
 import android.content.pm.PackageManager
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
