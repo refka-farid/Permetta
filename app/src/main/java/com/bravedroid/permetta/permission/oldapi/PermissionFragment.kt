@@ -6,18 +6,22 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
-import com.bravedroid.api.DangerousPermission
-import com.bravedroid.api.PermissionStatus
-import com.bravedroid.api.fragmentpermission.OldCorePermissionFragment
-import com.bravedroid.permetta.databinding.FragmentPermissionBinding
+import com.bravedroid.api.entities.DangerousPermission
+import com.bravedroid.api.entities.PermissionStatus
+import com.bravedroid.api.old.PermissionHelper
+import com.bravedroid.permetta.base.BaseFragment
 import com.bravedroid.permetta.base.LogHelper.logInformation
+import com.bravedroid.permetta.databinding.FragmentPermissionBinding
 
 
-class PermissionFragment : OldCorePermissionFragment() {
+class PermissionFragment : BaseFragment() {
     private var binding: FragmentPermissionBinding? = null
+    private val permissionHelper: PermissionHelper = PermissionHelper()
 
     companion object {
         @JvmStatic
@@ -65,7 +69,7 @@ class PermissionFragment : OldCorePermissionFragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        (context as PermissionActivity).lifecycle.addObserver(PermissionActivityObserver(context))
+        (context as AppCompatActivity).lifecycle.addObserver(PermissionActivityObserver(context))
     }
 
     override fun onCreateView(
@@ -85,7 +89,8 @@ class PermissionFragment : OldCorePermissionFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding?.buttonPermission?.setOnClickListener {
-            requestPermission(
+            permissionHelper.requestPermission(
+                this,
                 listOf(
                     DangerousPermission.ACCESS_FINE_LOCATION,
                     DangerousPermission.CAMERA,
@@ -93,6 +98,15 @@ class PermissionFragment : OldCorePermissionFragment() {
                 ::onPermissionsResponse,
             )
         }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        permissionHelper.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     private fun onPermissionsResponse(statusPermissionsMap: Map<DangerousPermission, PermissionStatus>) {

@@ -1,4 +1,4 @@
-package com.bravedroid.api
+package com.bravedroid.api.entities
 
 import android.Manifest
 

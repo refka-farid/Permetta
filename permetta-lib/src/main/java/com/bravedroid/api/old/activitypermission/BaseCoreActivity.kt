@@ -1,8 +1,8 @@
-package com.bravedroid.api.activitypermission
+package com.bravedroid.api.old.activitypermission
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.bravedroid.api.LogCoreHelper.logLifeCycle
+import com.bravedroid.api.old.util.LogCoreHelper.logLifeCycle
 
 open class BaseCoreActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

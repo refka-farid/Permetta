@@ -3,7 +3,7 @@
     package="com.bravedroid.api">
 
     <application>
-        <activity android:name=".activitypermission.OldCorePermissionActivity"></activity>
+        <activity android:name="com.bravedroid.api.old.activitypermission.OldCorePermissionActivity"></activity>
     </application>
 
 </manifest>

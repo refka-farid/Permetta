@@ -17,6 +17,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Permetta">
+        <activity android:name=".permission.oldapi.NoExtendPermissionActivity"
+            android:exported="true"/>
         <activity android:name=".permission.drawer.MasterDetailsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,4 +30,5 @@
             android:name=".permission.oldapi.PermissionActivity"
             android:exported="true" />
     </application>
+
 </manifest>

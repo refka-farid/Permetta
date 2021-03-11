@@ -9,8 +9,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
-import com.bravedroid.api.LogCoreHelper.logLifeCycle
-import com.bravedroid.api.activitypermission.OldCorePermissionActivity
+import com.bravedroid.api.old.util.LogCoreHelper.logLifeCycle
+import com.bravedroid.api.old.activitypermission.OldCorePermissionActivity
+import com.bravedroid.api.old.util.LogCoreHelper
 
 open class BaseCoreFragment : Fragment(), LifecycleObserver {
 

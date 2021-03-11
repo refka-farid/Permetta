@@ -1,10 +1,10 @@
-package com.bravedroid.api.activitypermission
+package com.bravedroid.api.old.activitypermission
 
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.core.app.ActivityCompat
-import com.bravedroid.api.DangerousPermission
-import com.bravedroid.api.PermissionStatus
+import com.bravedroid.api.entities.DangerousPermission
+import com.bravedroid.api.entities.PermissionStatus
 import com.bravedroid.api.R
 import kotlin.random.Random
 
@@ -13,10 +13,6 @@ open class OldCorePermissionActivity : BaseCoreActivity() {
         null
 
     private var requestCodeRandom: Int = -1
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_old_core_permission)
-    }
 
     fun requestPermission(
         permissions: Collection<DangerousPermission>,

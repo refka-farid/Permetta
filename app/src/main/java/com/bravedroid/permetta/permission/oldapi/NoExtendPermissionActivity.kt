@@ -4,18 +4,19 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
 import com.bravedroid.api.entities.DangerousPermission
-import com.bravedroid.api.old.activitypermission.OldCorePermissionActivity
 import com.bravedroid.api.entities.PermissionStatus
+import com.bravedroid.api.old.PermissionHelper
 import com.bravedroid.permetta.R
-import com.bravedroid.permetta.databinding.ActivityPermissionBinding
+import com.bravedroid.permetta.databinding.ActivityNoExtendPermissionBinding
 
+class NoExtendPermissionActivity : AppCompatActivity() {
 
-class PermissionActivity : OldCorePermissionActivity() {
-
+    private val permissionHelper: PermissionHelper = PermissionHelper()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val binding = ActivityPermissionBinding.inflate(layoutInflater)
+        val binding = ActivityNoExtendPermissionBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
@@ -43,7 +44,8 @@ class PermissionActivity : OldCorePermissionActivity() {
                 return true
             }
             R.id.multiple_permission_old -> {
-                requestPermission(
+                permissionHelper.requestPermission(
+                    this,
                     listOf(
                         DangerousPermission.ACCESS_FINE_LOCATION,
                         DangerousPermission.CAMERA,
@@ -71,5 +73,14 @@ class PermissionActivity : OldCorePermissionActivity() {
         }.forEach {
             Log.d("PERMISSION_DENIED", "${it.key} ")
         }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        permissionHelper.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 }

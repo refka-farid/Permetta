@@ -1,34 +1,18 @@
-package com.bravedroid.api.fragmentpermission
+package com.bravedroid.api.old.fragmentpermission
 
 import android.content.pm.PackageManager
-import android.os.Bundle
 import com.bravedroid.api.BaseCoreFragment
-import com.bravedroid.api.DangerousPermission
-import com.bravedroid.api.PermissionStatus
+import com.bravedroid.api.entities.DangerousPermission
+import com.bravedroid.api.entities.PermissionStatus
 import kotlin.random.Random
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
 open class OldCorePermissionFragment : BaseCoreFragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
     private var mOnPermissionResponse: ((Map<DangerousPermission, PermissionStatus>) -> Unit)? =
         null
 
     private var requestCodeRandom: Int = -1
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
 
     fun requestPermission(
         permissions: Collection<DangerousPermission>,
@@ -71,7 +55,6 @@ open class OldCorePermissionFragment : BaseCoreFragment() {
 
     companion object {
         @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            OldCorePermissionFragment()
+        fun newInstance() = OldCorePermissionFragment()
     }
 }
