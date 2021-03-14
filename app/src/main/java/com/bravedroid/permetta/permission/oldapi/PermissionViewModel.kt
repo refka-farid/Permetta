@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.distinctUntilChanged
 import com.bravedroid.api.entities.DangerousPermission
 import com.bravedroid.api.entities.PermissionStatus
 import com.bravedroid.api.old.PermissionHelper
@@ -21,8 +22,8 @@ class PermissionViewModel(
     val statusPermissionsMap: LiveData<(Map<DangerousPermission, PermissionStatus>)> =
         _statusPermissionsMap
 
-    private val _canShowUserExplanation = MutableLiveData<Boolean>(false)
-    val canShowUserExplanation: LiveData<Boolean> = _canShowUserExplanation
+    private val _canShowUserExplanation = SingleLiveEvent<Boolean>()
+    val canShowUserExplanation: SingleLiveEvent<Boolean> = _canShowUserExplanation
 
 
     fun requestPermission(
