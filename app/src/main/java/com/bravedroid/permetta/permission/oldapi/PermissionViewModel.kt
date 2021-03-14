@@ -1,5 +1,6 @@
 package com.bravedroid.permetta.permission.oldapi
 
+import android.content.Context
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -20,6 +21,10 @@ class PermissionViewModel(
     val statusPermissionsMap: LiveData<(Map<DangerousPermission, PermissionStatus>)> =
         _statusPermissionsMap
 
+    private val _canShowUserExplanation = MutableLiveData<Boolean>(false)
+    val canShowUserExplanation: LiveData<Boolean> = _canShowUserExplanation
+
+
     fun requestPermission(
         activity: AppCompatActivity,
         permissions: Collection<DangerousPermission>,
@@ -33,13 +38,29 @@ class PermissionViewModel(
 
     fun requestPermission(
         fragment: Fragment,
+        context: Context,
+        activity: AppCompatActivity,
         permissions: Collection<DangerousPermission>,
     ) {
         permissionHelper.requestPermission(
             fragment,
+            context,
+            activity,
             permissions,
             ::onPermissionsResponse,
+            ::onUserExplanation,
         )
+    }
+
+    private fun onUserExplanation(canShowUserExplanation: Boolean) {
+        _canShowUserExplanation.value = canShowUserExplanation
+    }
+
+    fun requestPermissionDirectly(
+        fragment: Fragment,
+        permissions: Collection<DangerousPermission>,
+    ) {
+        permissionHelper.requestPermissionDirectly(fragment, permissions)
     }
 
     fun onRequestPermissionsResult(
@@ -49,7 +70,7 @@ class PermissionViewModel(
     ) {
         permissionHelper.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
-
+    
     private fun onPermissionsResponse(statusPermissionsMap: Map<DangerousPermission, PermissionStatus>) {
         _statusPermissionsMap.value = statusPermissionsMap
         statusPermissionsMap.filter {

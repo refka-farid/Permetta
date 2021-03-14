@@ -1,13 +1,16 @@
 package com.bravedroid.permetta.permission.oldapi
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.bravedroid.api.entities.DangerousPermission
 import com.bravedroid.api.entities.PermissionStatus
+import com.bravedroid.permetta.R
 import com.bravedroid.permetta.base.BaseFragment
 import com.bravedroid.permetta.databinding.FragmentPermissionBinding
 
@@ -42,6 +45,8 @@ class PermissionFragment : BaseFragment() {
         binding?.buttonPermission?.setOnClickListener {
             viewModel.requestPermission(
                 this,
+                requireContext(),
+                activity as AppCompatActivity,
                 listOf(
                     DangerousPermission.ACCESS_FINE_LOCATION,
                     DangerousPermission.CAMERA,
@@ -52,12 +57,20 @@ class PermissionFragment : BaseFragment() {
         viewModel.statusPermissionsMap.observe(viewLifecycleOwner) { observedMap: Map<DangerousPermission, PermissionStatus>? ->
             observedMap?.filter {
                 it.value == PermissionStatus.GRANTED
-            }?.apply {
-                Toast.makeText(
-                    requireContext(),
-                    "${this.keys}",
-                    Toast.LENGTH_SHORT,
-                ).show()
+            }.apply {
+                if(this!= null && isNotEmpty()){
+                        Toast.makeText(
+                            requireContext(),
+                            "${this.keys}",
+                            Toast.LENGTH_SHORT,
+                        ).show()
+                }
+            }
+        }
+
+        viewModel.canShowUserExplanation.observe(viewLifecycleOwner) {
+            if (it) {
+                showDialogForRationalDialog()
             }
         }
     }
@@ -74,5 +87,26 @@ class PermissionFragment : BaseFragment() {
     private fun injectViewModel() {
         val factory = ViewModelFactory(requireContext())
         viewModel = ViewModelProvider(requireActivity(), factory)[PermissionViewModel::class.java]
+    }
+
+    private fun showDialogForRationalDialog() {
+        AlertDialog
+            .Builder(requireContext())
+            .setTitle(getString(R.string.rationale_title))
+            .setMessage(getString(R.string.rationale_desc))
+            .setPositiveButton(" Ask Permissions ")
+            { _, _ ->
+                viewModel.requestPermissionDirectly(
+                    this,
+                    listOf(
+                        DangerousPermission.ACCESS_FINE_LOCATION,
+                        DangerousPermission.CAMERA,
+                    )
+                )
+            }
+            .setNegativeButton("cancel") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
     }
 }

@@ -1,7 +1,10 @@
 package com.bravedroid.api.old
 
+import android.content.Context
 import android.content.pm.PackageManager
-import android.util.Log
+import android.os.Build.VERSION
+import android.os.Build.VERSION_CODES
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
@@ -14,6 +17,9 @@ class PermissionHelper {
         null
 
     private var requestCodeRandom: Int = -1
+
+    private val statusPermissionsMap: MutableMap<DangerousPermission, PermissionStatus> =
+        mutableMapOf()
 
     fun requestPermission(
         activity: AppCompatActivity,
@@ -28,28 +34,6 @@ class PermissionHelper {
             {
                 ActivityCompat.requestPermissions(
                     activity,
-                    permissions.map {
-                        it.permissionName
-                    }.toTypedArray(),
-                    requestCodeRandom
-                )
-            }
-        )
-    }
-
-
-    fun requestPermission(
-        fragment: Fragment,
-        permissions: Collection<DangerousPermission>,
-        onPermissionResponse: ((Map<DangerousPermission, PermissionStatus>) -> Unit),
-        onError: ((Exception) -> Unit)? = null,
-    ) {
-        requestPermissionBlock(
-            permissions,
-            onPermissionResponse,
-            onError,
-            {
-                fragment.requestPermissions(
                     permissions.map {
                         it.permissionName
                     }.toTypedArray(),
@@ -74,12 +58,77 @@ class PermissionHelper {
         }
     }
 
+    fun requestPermission(
+        fragment: Fragment,
+        context: Context,
+        activity: AppCompatActivity,
+        permissions: Collection<DangerousPermission>,
+        onPermissionResponse: ((Map<DangerousPermission, PermissionStatus>) -> Unit),
+        onUserExplanation: ((Boolean) -> Unit)? = null,
+        onError: ((Exception) -> Unit)? = null,
+    ) {
+        permissionResponse = onPermissionResponse
+
+        if (permissions.isEmpty()) {
+            onError?.invoke(IllegalArgumentException(" param permissions should not be empty you have to declare your permissions when calling this method  "))
+            return
+        }
+
+        if (VERSION.SDK_INT < VERSION_CODES.M) {
+            requestPermissionDirectly(fragment, permissions)
+            return
+        }
+
+        when {
+            areAllPermissionsGranted(permissions, context) -> {
+                for (permission in permissions) {
+                    statusPermissionsMap[permission] = PermissionStatus.GRANTED
+                }
+                permissionResponse?.invoke(statusPermissionsMap)
+                statusPermissionsMap.clear()
+            }
+            onUserExplanation!=null && containsAnyRequestPermissionRational(permissions, activity) -> {
+                onUserExplanation.invoke(true)
+            }
+            else -> requestPermissionDirectly(fragment, permissions)
+        }
+    }
+
+    @RequiresApi(VERSION_CODES.M)
+    private fun areAllPermissionsGranted(
+        permissions: Collection<DangerousPermission>,
+        context: Context
+    ) = permissions.all {
+        context.checkSelfPermission(it.permissionName) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun containsAnyRequestPermissionRational(
+        permissions: Collection<DangerousPermission>,
+        activity: AppCompatActivity
+    ) = permissions.any {
+        ActivityCompat.shouldShowRequestPermissionRationale(
+            activity,
+            it.permissionName
+        )
+    }
+
+    fun requestPermissionDirectly(
+        fragment: Fragment,
+        permissions: Collection<DangerousPermission>,
+    ) {
+        fragment.requestPermissions(
+            permissions.map {
+                it.permissionName
+            }.toTypedArray(),
+            requestCodeRandom
+        )
+    }
+
     fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        val statusPermissionsMap: MutableMap<DangerousPermission, PermissionStatus> = mutableMapOf()
         if (requestCode == requestCodeRandom) {
             grantResults.forEachIndexed { index, element ->
                 val permission = DangerousPermission.fromPermissionName(permissions[index])
@@ -92,5 +141,6 @@ class PermissionHelper {
         }
         permissionResponse?.invoke(statusPermissionsMap)
         permissionResponse = null
+        statusPermissionsMap.clear()
     }
 }
