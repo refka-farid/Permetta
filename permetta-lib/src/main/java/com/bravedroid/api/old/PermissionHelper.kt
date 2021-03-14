@@ -25,9 +25,48 @@ class PermissionHelper {
         activity: AppCompatActivity,
         permissions: Collection<DangerousPermission>,
         onPermissionResponse: ((Map<DangerousPermission, PermissionStatus>) -> Unit),
+        onUserExplanation: ((Boolean) -> Unit)? = null,
         onError: ((Exception) -> Unit)? = null,
     ) {
-        requestPermissionBlock(
+        requestCodeRandom = Random.nextInt(100)
+        permissionResponse = onPermissionResponse
+
+        if (permissions.isEmpty()) {
+            onError?.invoke(IllegalArgumentException(" param permissions should not be empty you have to declare your permissions when calling this method  "))
+            return
+        }
+
+        if (VERSION.SDK_INT < VERSION_CODES.M) {
+            requestPermissionDirectly(activity, permissions)
+            return
+        }
+
+        when {
+            areAllPermissionsGranted(permissions, activity) -> {
+                for (permission in permissions) {
+                    statusPermissionsMap[permission] = PermissionStatus.GRANTED
+                }
+                permissionResponse?.invoke(statusPermissionsMap)
+                statusPermissionsMap.clear()
+            }
+            onUserExplanation != null && containsAnyRequestPermissionRational(
+                permissions,
+                activity,
+            ) -> {
+                onUserExplanation.invoke(true)
+            }
+            else -> requestPermissionDirectly(activity, permissions)
+        }
+    }
+
+
+    private fun requestPermissionDep(
+        activity: AppCompatActivity,
+        permissions: Collection<DangerousPermission>,
+        onPermissionResponse: ((Map<DangerousPermission, PermissionStatus>) -> Unit),
+        onError: ((Exception) -> Unit)? = null,
+    ) {
+        requestPermissionBlockDep(
             permissions,
             onPermissionResponse,
             onError,
@@ -43,7 +82,7 @@ class PermissionHelper {
         )
     }
 
-    private fun requestPermissionBlock(
+    private fun requestPermissionBlockDep(
         permissions: Collection<DangerousPermission>,
         onPermissionResponse: ((Map<DangerousPermission, PermissionStatus>) -> Unit),
         onError: ((Exception) -> Unit)? = null,
@@ -61,7 +100,6 @@ class PermissionHelper {
     fun requestPermission(
         fragment: Fragment,
         context: Context,
-        activity: AppCompatActivity,
         permissions: Collection<DangerousPermission>,
         onPermissionResponse: ((Map<DangerousPermission, PermissionStatus>) -> Unit),
         onUserExplanation: ((Boolean) -> Unit)? = null,
@@ -87,7 +125,10 @@ class PermissionHelper {
                 permissionResponse?.invoke(statusPermissionsMap)
                 statusPermissionsMap.clear()
             }
-            onUserExplanation!=null && containsAnyRequestPermissionRational(permissions, activity) -> {
+            onUserExplanation != null && containsAnyRequestPermissionRational(
+                permissions,
+                (fragment.requireActivity()) as AppCompatActivity,
+            ) -> {
                 onUserExplanation.invoke(true)
             }
             else -> requestPermissionDirectly(fragment, permissions)
@@ -117,6 +158,19 @@ class PermissionHelper {
         permissions: Collection<DangerousPermission>,
     ) {
         fragment.requestPermissions(
+            permissions.map {
+                it.permissionName
+            }.toTypedArray(),
+            requestCodeRandom
+        )
+    }
+
+    fun requestPermissionDirectly(
+        activity: AppCompatActivity,
+        permissions: Collection<DangerousPermission>,
+    ) {
+        ActivityCompat.requestPermissions(
+            activity,
             permissions.map {
                 it.permissionName
             }.toTypedArray(),

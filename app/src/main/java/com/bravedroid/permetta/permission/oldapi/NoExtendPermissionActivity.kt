@@ -1,23 +1,26 @@
 package com.bravedroid.permetta.permission.oldapi
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.bravedroid.api.entities.DangerousPermission
 import com.bravedroid.api.entities.PermissionStatus
-import com.bravedroid.api.old.PermissionHelper
 import com.bravedroid.permetta.R
-import com.bravedroid.permetta.databinding.ActivityNoExtendPermissionBinding
+import com.bravedroid.permetta.databinding.ActivityPermissionBinding
 
 class NoExtendPermissionActivity : AppCompatActivity() {
 
-    private val permissionHelper: PermissionHelper = PermissionHelper()
+    private lateinit var viewModel: PermissionViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val binding = ActivityNoExtendPermissionBinding.inflate(layoutInflater)
+        injectViewModel()
+        val binding = ActivityPermissionBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
@@ -28,6 +31,26 @@ class NoExtendPermissionActivity : AppCompatActivity() {
             supportFragmentManager.beginTransaction()
                 .add(R.id.fragment_container, PermissionFragment.newInstance())
                 .commit()
+        }
+
+        viewModel.statusPermissionsMap.observe(this) { observedMap: Map<DangerousPermission, PermissionStatus>? ->
+            observedMap?.filter {
+                it.value == PermissionStatus.GRANTED
+            }.apply {
+                if (this != null && isNotEmpty()) {
+                    Toast.makeText(
+                        this@NoExtendPermissionActivity,
+                        "${this.keys}",
+                        Toast.LENGTH_SHORT,
+                    ).show()
+                }
+            }
+        }
+
+        viewModel.canShowUserExplanation.observe(this) {
+            if (it) {
+                showDialogForRationalDialog()
+            }
         }
     }
 
@@ -45,13 +68,12 @@ class NoExtendPermissionActivity : AppCompatActivity() {
                 return true
             }
             R.id.multiple_permission_old -> {
-                permissionHelper.requestPermission(
+                viewModel.requestPermission(
                     this,
                     listOf(
                         DangerousPermission.ACCESS_FINE_LOCATION,
                         DangerousPermission.CAMERA,
                     ),
-                    ::onPermissionsResponse,
                 )
                 return true
             }
@@ -82,7 +104,33 @@ class NoExtendPermissionActivity : AppCompatActivity() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        permissionHelper.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        viewModel.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
+    private fun injectViewModel() {
+        val factory = ViewModelFactory(this)
+        viewModel = ViewModelProvider(this, factory)[PermissionViewModel::class.java]
+    }
+
+    private fun showDialogForRationalDialog() {
+        AlertDialog
+            .Builder(this)
+            .setTitle(getString(R.string.rationale_title))
+            .setMessage(getString(R.string.rationale_desc))
+            .setPositiveButton(" Ask Permissions ")
+            { _, _ ->
+                viewModel.requestPermissionDirectly(
+                    this,
+                    listOf(
+                        DangerousPermission.ACCESS_FINE_LOCATION,
+                        DangerousPermission.CAMERA,
+                    )
+                )
+            }
+            .setNegativeButton("cancel") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
     }
 
 }

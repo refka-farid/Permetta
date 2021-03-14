@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.bravedroid.api.entities.DangerousPermission
 import com.bravedroid.api.entities.PermissionStatus
@@ -46,7 +45,6 @@ class PermissionFragment : BaseFragment() {
             viewModel.requestPermission(
                 this,
                 requireContext(),
-                activity as AppCompatActivity,
                 listOf(
                     DangerousPermission.ACCESS_FINE_LOCATION,
                     DangerousPermission.CAMERA,
@@ -58,12 +56,12 @@ class PermissionFragment : BaseFragment() {
             observedMap?.filter {
                 it.value == PermissionStatus.GRANTED
             }.apply {
-                if(this!= null && isNotEmpty()){
-                        Toast.makeText(
-                            requireContext(),
-                            "${this.keys}",
-                            Toast.LENGTH_SHORT,
-                        ).show()
+                if (this != null && isNotEmpty()) {
+                    Toast.makeText(
+                        requireContext(),
+                        "${this.keys}",
+                        Toast.LENGTH_SHORT,
+                    ).show()
                 }
             }
         }
