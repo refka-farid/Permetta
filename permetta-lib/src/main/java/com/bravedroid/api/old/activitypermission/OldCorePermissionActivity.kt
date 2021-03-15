@@ -1,11 +1,12 @@
 package com.bravedroid.api.old.activitypermission
 
 import android.content.pm.PackageManager
-import android.os.Bundle
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.bravedroid.api.entities.DangerousPermission
 import com.bravedroid.api.entities.PermissionStatus
-import com.bravedroid.api.R
 import kotlin.random.Random
 
 open class OldCorePermissionActivity : BaseCoreActivity() {
@@ -13,25 +14,71 @@ open class OldCorePermissionActivity : BaseCoreActivity() {
         null
 
     private var requestCodeRandom: Int = -1
+    private val statusPermissionsMap: MutableMap<DangerousPermission, PermissionStatus> = mutableMapOf()
 
     fun requestPermission(
         permissions: Collection<DangerousPermission>,
         onPermissionResponse: ((Map<DangerousPermission, PermissionStatus>) -> Unit),
+        onUserExplanation: (() -> Unit)? = null,
         onError: ((Exception) -> Unit)? = null,
     ) {
         requestCodeRandom = Random.nextInt(100)
         mOnPermissionResponse = onPermissionResponse
-        if (permissions.isNotEmpty()) {
-            ActivityCompat.requestPermissions(
-                this,
-                permissions.map {
-                    it.permissionName
-                }.toTypedArray(),
-                requestCodeRandom
-            )
-        } else {
+
+        if (permissions.isEmpty()) {
             onError?.invoke(IllegalArgumentException(" param permissions should not be empty you have to declare your permissions when calling this method  "))
+            return
         }
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            requestPermissionDirectly(this, permissions)
+            return
+        }
+
+        when {
+            areAllPermissionsGranted(permissions) -> {
+                for (permission in permissions) {
+                    statusPermissionsMap[permission] = PermissionStatus.GRANTED
+                }
+                onPermissionResponse.invoke(statusPermissionsMap)
+                statusPermissionsMap.clear()
+            }
+            onUserExplanation != null && containsAnyRequestPermissionRational(
+                permissions,
+            ) -> {
+                onUserExplanation.invoke()
+            }
+            else -> requestPermissionDirectly(this, permissions)
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun areAllPermissionsGranted(
+        permissions: Collection<DangerousPermission>,
+    ) = permissions.all {
+        checkSelfPermission(it.permissionName) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun containsAnyRequestPermissionRational(
+        permissions: Collection<DangerousPermission>,
+    ) = permissions.any {
+        ActivityCompat.shouldShowRequestPermissionRationale(
+            this,
+            it.permissionName
+        )
+    }
+
+     fun requestPermissionDirectly(
+        activity: AppCompatActivity,
+        permissions: Collection<DangerousPermission>,
+    ) {
+        ActivityCompat.requestPermissions(
+            activity,
+            permissions.map {
+                it.permissionName
+            }.toTypedArray(),
+            requestCodeRandom
+        )
     }
 
     override fun onRequestPermissionsResult(
@@ -40,7 +87,6 @@ open class OldCorePermissionActivity : BaseCoreActivity() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        val statusPermissionsMap: MutableMap<DangerousPermission, PermissionStatus> = mutableMapOf()
         if (requestCode == requestCodeRandom) {
             grantResults.forEachIndexed { index, element ->
                 val permission = DangerousPermission.fromPermissionName(permissions[index])
@@ -52,5 +98,7 @@ open class OldCorePermissionActivity : BaseCoreActivity() {
             }
         }
         mOnPermissionResponse?.invoke(statusPermissionsMap)
+        mOnPermissionResponse = null
+        statusPermissionsMap.clear()
     }
 }
