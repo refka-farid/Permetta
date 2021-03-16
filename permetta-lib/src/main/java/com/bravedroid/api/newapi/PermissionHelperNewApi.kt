@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -12,14 +13,35 @@ import com.bravedroid.api.entities.DangerousPermission
 import com.bravedroid.api.entities.PermissionStatus
 
 class PermissionHelperNewApi {
+    private lateinit var requestPermissionLauncher: ActivityResultLauncher<Array<String>>
+
     private var permissionResponse: ((Map<DangerousPermission, PermissionStatus>) -> Unit)? =
         null
 
     private val statusPermissionsMap: MutableMap<DangerousPermission, PermissionStatus> =
         mutableMapOf()
 
+
+    fun register(activity: AppCompatActivity) {
+        requestPermissionLauncher = activity.registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { allPermissions ->
+            allPermissions.forEach { (s, b) ->
+                val fromPermissionName = DangerousPermission.fromPermissionName(s)
+                if (b) {
+                    statusPermissionsMap[fromPermissionName] = PermissionStatus.GRANTED
+                } else {
+                    statusPermissionsMap[fromPermissionName] = PermissionStatus.DENIED
+                }
+            }
+
+            permissionResponse?.invoke(statusPermissionsMap)
+            permissionResponse = null
+            statusPermissionsMap.clear()
+        }
+    }
+
     fun requestPermission(
-        requestPermissionLauncher: ActivityResultLauncher<Array<String>>,
         activity: AppCompatActivity,
         permissions: Collection<DangerousPermission>,
         onPermissionResponse: ((Map<DangerousPermission, PermissionStatus>) -> Unit),
@@ -34,7 +56,7 @@ class PermissionHelperNewApi {
         }
 
         if (VERSION.SDK_INT < VERSION_CODES.M) {
-            requestPermissionDirectly(permissions, requestPermissionLauncher)
+            requestPermissionDirectly(permissions)
             return
         }
 
@@ -44,6 +66,7 @@ class PermissionHelperNewApi {
                     statusPermissionsMap[permission] = PermissionStatus.GRANTED
                 }
                 permissionResponse?.invoke(statusPermissionsMap)
+                permissionResponse = null
                 statusPermissionsMap.clear()
             }
 
@@ -53,7 +76,7 @@ class PermissionHelperNewApi {
             ) -> {
                 onUserExplanation.invoke(true)
             }
-            else -> requestPermissionDirectly(permissions, requestPermissionLauncher)
+            else -> requestPermissionDirectly(permissions)
         }
     }
 
@@ -77,7 +100,6 @@ class PermissionHelperNewApi {
 
     fun requestPermissionDirectly(
         permissions: Collection<DangerousPermission>,
-        requestPermissionLauncher: ActivityResultLauncher<Array<String>>,
     ) {
         requestPermissionLauncher.launch(
             permissions.map {

@@ -1,6 +1,5 @@
 package com.bravedroid.permetta.permission.oldapi
 
-import android.app.Activity
 import android.content.Context
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -58,8 +57,7 @@ class PermissionViewModel(
         permissionHelper.requestPermissionDirectly(fragment, permissions)
     }
 
-
-fun requestPermissionDirectly(
+    fun requestPermissionDirectly(
         activity: AppCompatActivity,
         permissions: Collection<DangerousPermission>,
     ) {
